@@ -8,7 +8,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   GraduationCap, BookOpen, MessageSquare, Users, FileText, Plus, TrendingUp, Settings, LogOut, Globe, Lock
 } from "lucide-react";
-// ⛔ removido AskAIButton
 import { getSubjectsByRole } from "@/lib/mock-data";
 import { Subject } from "@/types";
 import { getCurrentUser, clearCurrentUser } from "@/lib/auth";
@@ -34,7 +33,6 @@ const Dashboard = () => {
     }
   }, [navigate]);
 
-  // garante array mesmo se a função retornar undefined
   const subjects: Subject[] = useMemo(() => {
     try {
       const r = getSubjectsByRole?.(user.role);
@@ -61,14 +59,21 @@ const Dashboard = () => {
             <CardTitle className="text-lg group-hover:text-primary transition-colors">{subject.name}</CardTitle>
             <CardDescription className="text-sm">{subject.description}</CardDescription>
           </div>
+
           <div className="flex items-center gap-2">
             {subject.isPublic ? (
-              <Badge variant="secondary" className="gap-1"><Globe className="h-3 w-3" />Pública</Badge>
+              <Badge variant="secondary" className="gap-1">
+                <Globe className="h-3 w-3" />
+                Pública
+              </Badge>
             ) : (
-              <Badge variant="outline" className="gap-1"><Lock className="h-3 w-3" />Privada</Badge>
+              <Badge variant="outline" className="gap-1">
+                <Lock className="h-3 w-3" />
+                Privada
+              </Badge>
             )}
 
-            {/* ✅ botão simples para aluno (evita crash do AskAIButton) */}
+            {/* ✅ botão simples para aluno (abre chat) */}
             {user.role === "ALUNO" && (
               <Button
                 size="sm"
@@ -86,10 +91,29 @@ const Dashboard = () => {
       <CardContent className="pt-0">
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1"><FileText className="h-4 w-4" />{subject._count?.sources || 0} arquivos</span>
-            <span className="flex items-center gap-1"><MessageSquare className="h-4 w-4" />{subject._count?.chatMessages || 0} perguntas</span>
+            <span className="flex items-center gap-1">
+              <FileText className="h-4 w-4" />
+              {subject._count?.sources || 0} arquivos
+            </span>
+            <span className="flex items-center gap-1">
+              <MessageSquare className="h-4 w-4" />
+              {subject._count?.chatMessages || 0} perguntas
+            </span>
           </div>
-          <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity">
+
+          {/* ✅ agora o botão fantasma realmente navega:
+               - Professor: vai para gerenciamento de arquivos
+               - Aluno: vai para o chat da matéria */}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() =>
+              user.role === "PROFESSOR"
+                ? navigate(`/subjects/${subject.id}`)
+                : navigate(`/chat?subjectId=${subject.id}`)
+            }
+          >
             {user.role === "PROFESSOR" ? "Gerenciar" : "Acessar"}
           </Button>
         </div>

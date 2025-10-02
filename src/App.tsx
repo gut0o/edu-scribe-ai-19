@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Chat from "./pages/Chat";
 import NotFound from "./pages/NotFound";
 import { getCurrentUser } from "@/lib/auth";
+import SubjectManage from "./pages/SubjectManage"; // ✅ NOVO
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
+
           <Route
             path="/dashboard"
             element={
@@ -35,6 +37,7 @@ const App = () => (
               </PrivateRoute>
             }
           />
+
           {/* /chat sem parâmetro, como está hoje */}
           <Route
             path="/chat"
@@ -44,6 +47,17 @@ const App = () => (
               </PrivateRoute>
             }
           />
+
+          {/* ✅ NOVA ROTA: gerenciamento de arquivos por matéria */}
+          <Route
+            path="/subjects/:id"
+            element={
+              <PrivateRoute>
+                <SubjectManage />
+              </PrivateRoute>
+            }
+          />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
